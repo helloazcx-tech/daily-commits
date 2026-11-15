@@ -1,0 +1,35 @@
+name: Daily check-in (morning)
+
+on:
+  schedule:
+    - cron: '0 13 * * *' # 08:00 EST (UTC-5)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-checkin
+  cancel-in-progress: false
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Random delay within the morning window (0-240 min)
+        run: sleep $((RANDOM % 14401))
+      - uses: actions/checkout@v4
+      - name: Commit today's check-in if missing
+        run: |
+          TODAY=$(TZ=America/New_York date +%F)
+          if grep -q "^$TODAY" log.md 2>/dev/null; then
+            echo "Already checked in on $TODAY, skipping."
+            exit 0
+          fi
+          echo "$TODAY daily check-in" >> log.md
+          git config user.name "helloazcx-tech"
+          git config user.email "355238826+helloazcx-tech@users.noreply.github.com"
+          git add log.md
+          git diff --cached --quiet && echo "Nothing to commit." && exit 0
+          git commit -m "Daily check-in $TODAY"
+          git push
