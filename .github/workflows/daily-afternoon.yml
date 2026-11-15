@@ -2,7 +2,7 @@ name: Daily check-in (afternoon)
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 13:00 EST (UTC-5)
+    - cron: '0 19 * * *' # 14:00 EST (UTC-5)
   workflow_dispatch:
 
 permissions:
@@ -16,8 +16,8 @@ jobs:
   checkin:
     runs-on: ubuntu-latest
     steps:
-      - name: Random delay within the afternoon window (0-300 min)
-        run: sleep $((RANDOM % 18001))
+      - name: Random delay within the afternoon window (0-240 min)
+        run: sleep $((RANDOM % 14401))
       - uses: actions/checkout@v4
       - name: Commit today's check-in if missing
         run: |
